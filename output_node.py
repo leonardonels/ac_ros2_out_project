@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
+from scipy.spatial.transform import Rotation as R
 import time
 import rclpy
 from nav_msgs.msg import Odometry
-import os
+import sys
 
 
 class AC_out:
-    def __init__(self):
+    def __init__(self, loop=False):
         self.node = rclpy.create_node('pointcloud_filter')
         self.publisher = self.node.create_publisher(Odometry, 'odometry', 10)
         header = [
@@ -35,22 +36,22 @@ class AC_out:
             "accG_x",
             "accG_y",
             "accG_z",
+            "worldMatrix_M00",
+            "worldMatrix_M10",
+            "worldMatrix_M20",
+            "worldMatrix_M30",
+            "worldMatrix_M01",
             "worldMatrix_M11",
             "worldMatrix_M21",
             "worldMatrix_M31",
-            "worldMatrix_M41",
+            "worldMatrix_M02",
             "worldMatrix_M12",
             "worldMatrix_M22",
             "worldMatrix_M32",
-            "worldMatrix_M42",
+            "worldMatrix_M03",
             "worldMatrix_M13",
             "worldMatrix_M23",
-            "worldMatrix_M33",
-            "worldMatrix_M43",
-            "worldMatrix_M14",
-            "worldMatrix_M24",
-            "worldMatrix_M34",
-            "worldMatrix_M44"
+            "worldMatrix_M33"
         ]
         self.df = pd.read_csv("output_csv/giro-vallelunga.csv", names=header)
         self.df_iter = self.df.iterrows()
@@ -67,30 +68,59 @@ class AC_out:
             
             if self.previous_timestamp is not None:
                 delay = (current_timestamp - self.previous_timestamp) / 10**7
-                print(delay)
                 time.sleep(delay)
                 
             self.previous_timestamp = current_timestamp
 
 
-            msg = Odometry()
-            self.publisher.publish(msg)
+            odometry = Odometry()
+            odometry.header.stamp = self.node.get_clock().now().to_msg()
+            odometry.header.frame_id = "base_link"
+
+            odometry.pose.pose.position.x = -row['worldMatrix_M03']
+            odometry.pose.pose.position.y = row['worldMatrix_M23']
+            odometry.pose.pose.position.z = row['worldMatrix_M13']
+
+            r = R.from_matrix([[row['worldMatrix_M00'], row['worldMatrix_M01'], row['worldMatrix_M02']],
+                               [row['worldMatrix_M10'], row['worldMatrix_M11'], row['worldMatrix_M12']],
+                               [row['worldMatrix_M20'], row['worldMatrix_M21'], row['worldMatrix_M22']]])
+            angles = r.as_euler('zxy')
+            odometry.pose.pose.orientation.x = -angles[0]
+            odometry.pose.pose.orientation.y = angles[1]
+            odometry.pose.pose.orientation.z = angles[2]
+
+            odometry.twist.twist.linear.x = row['velocity_x']
+            odometry.twist.twist.linear.y = row['velocity_y']
+            odometry.twist.twist.linear.z = row['velocity_z']
+            odometry.twist.twist.angular.x = row['angularVelocity_x']
+            odometry.twist.twist.angular.y = row['angularVelocity_y']
+            odometry.twist.twist.angular.z = row['angularVelocity_z']
+
+            self.publisher.publish(odometry)
 
         except StopIteration:
-            self.node.get_logger().info("Fine del file CSV")
-            rclpy.shutdown()
+            if self.loop:
+                self.df_iter = self.df.iterrows()
+                self.previous_timestamp = None
+                print("Restarting CSV file reading.")
+            else:
+                print("End of CSV file reached. Exiting.")
 
 
 def main(args=None):
+    loop = False
+    if '-l' in sys.argv:
+        loop = True
+        sys.argv.remove('-l')
+    
     rclpy.init(args=args)
-    output = AC_out()
+    output = AC_out(loop=loop)
     try:
         rclpy.spin(output.node)
     except KeyboardInterrupt:
         pass
     finally:
         output.node.destroy_node()
-        rclpy.shutdown()
 
 
 if __name__ == '__main__':
