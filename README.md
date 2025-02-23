@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>Simple ROS2 node simulating odometry msgs from csv files</h1>
+    <h1>Simple ROS2 node simulating odometry.msg</h1>
 </div>
 
 ## :package: Prerequisite packages
