@@ -8,9 +8,10 @@ import sys
 
 
 class AC_out:
-    def __init__(self):
+    def __init__(self, loop=False):
         self.node = rclpy.create_node('sim_sim')
         self.publisher = self.node.create_publisher(Odometry, 'odometry', 10)
+        self.loop = loop
         header = [
             "timestamp",
             "engineRPM",
@@ -63,13 +64,15 @@ class AC_out:
         try:
             index, row = next(self.df_iter)
             current_timestamp = row.iloc[0]
-            
+
             if self.previous_timestamp is not None:
                 delay = (current_timestamp - self.previous_timestamp) / 10**7
+                # Verifica che il delay sia non negativo
+                if delay < 0:
+                    delay = 0
                 time.sleep(delay)
-                
-            self.previous_timestamp = current_timestamp
 
+            self.previous_timestamp = current_timestamp
 
             odometry = Odometry()
             odometry.header.stamp = self.node.get_clock().now().to_msg()
@@ -97,19 +100,28 @@ class AC_out:
             self.publisher.publish(odometry)
 
         except StopIteration:
-            print("End of CSV file reached. Exiting.")
+            if self.loop:
+                print("End of CSV file reached. Restarting.")
+                self.df_iter = self.df.iterrows()  # Reset the iterator to the start of the file
+            else:
+                print("End of CSV file reached. Exiting.")
+                rclpy.shutdown()
+
 
 
 def main(args=None):
-    
+    loop = '-l' in sys.argv
+
     rclpy.init(args=args)
-    output = AC_out()
+    output = AC_out(loop=loop)
     try:
         rclpy.spin(output.node)
     except KeyboardInterrupt:
         pass
     finally:
-        output.node.destroy_node()
+        if rclpy.ok():
+            output.node.destroy_node()
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':
