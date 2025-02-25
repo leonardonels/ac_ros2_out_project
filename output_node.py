@@ -53,13 +53,14 @@ class AC_out:
             "worldMatrix_M23",
             "worldMatrix_M33"
         ]
-        self.df = pd.read_csv("output_csv/vallelunga_lap.csv", names=header)
-        self.df_iter = self.df.iterrows()
+        while(loop):
+            self.df = pd.read_csv("output_csv/vallelunga_lap.csv", names=header)
+            self.df_iter = self.df.iterrows()
 
-        self.start_time = time.time()
-        self.previous_timestamp = None
-        
-        self.node.create_timer(0.01, self.callback)
+            self.start_time = time.time()
+            self.previous_timestamp = None
+
+            self.node.create_timer(0.01, self.callback)
 
     def callback(self):
         try:
@@ -99,12 +100,7 @@ class AC_out:
             self.publisher.publish(odometry)
 
         except StopIteration:
-            if self.loop:
-                self.df_iter = self.df.iterrows()
-                self.previous_timestamp = None
-                print("Restarting CSV file reading.")
-            else:
-                print("End of CSV file reached. Exiting.")
+            print("End of CSV file reached. Exiting.")
 
 
 def main(args=None):
