@@ -9,7 +9,7 @@ import sys
 
 class AC_out:
     def __init__(self, loop=False):
-        self.node = rclpy.create_node('pointcloud_filter')
+        self.node = rclpy.create_node('sim_sim')
         self.publisher = self.node.create_publisher(Odometry, 'odometry', 10)
         header = [
             "timestamp",
@@ -53,7 +53,7 @@ class AC_out:
             "worldMatrix_M23",
             "worldMatrix_M33"
         ]
-        self.df = pd.read_csv("output_csv/giro-vallelunga.csv", names=header)
+        self.df = pd.read_csv("output_csv/vallelunga_lap.csv", names=header)
         self.df_iter = self.df.iterrows()
 
         self.start_time = time.time()
