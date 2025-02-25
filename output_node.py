@@ -67,7 +67,6 @@ class AC_out:
 
             if self.previous_timestamp is not None:
                 delay = (current_timestamp - self.previous_timestamp) / 10**7
-                # Verifica che il delay sia non negativo
                 if delay < 0:
                     delay = 0
                 time.sleep(delay)
@@ -102,7 +101,7 @@ class AC_out:
         except StopIteration:
             if self.loop:
                 print("End of CSV file reached. Restarting.")
-                self.df_iter = self.df.iterrows()  # Reset the iterator to the start of the file
+                self.df_iter = self.df.iterrows()
             else:
                 print("End of CSV file reached. Exiting.")
                 rclpy.shutdown()
