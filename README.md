@@ -13,9 +13,8 @@ sudo apt-get install ros-humble-ros-gz-bridge python3-numpy python3-pandas -y
 git clone https://github.com/leonardonels/AC_ros2_out_project.git
 cd AC_ros2_out_project
 ```
-> use '-l' to loop the csv input file
 ```commandline
-python3 output_node.py -l
+python3 output_node.py
 ```
 
 ## Todo List

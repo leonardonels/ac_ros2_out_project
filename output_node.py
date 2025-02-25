@@ -8,7 +8,7 @@ import sys
 
 
 class AC_out:
-    def __init__(self, loop=False):
+    def __init__(self):
         self.node = rclpy.create_node('sim_sim')
         self.publisher = self.node.create_publisher(Odometry, 'odometry', 10)
         header = [
@@ -53,14 +53,11 @@ class AC_out:
             "worldMatrix_M23",
             "worldMatrix_M33"
         ]
-        while(loop):
-            self.df = pd.read_csv("output_csv/vallelunga_lap.csv", names=header)
-            self.df_iter = self.df.iterrows()
-
-            self.start_time = time.time()
-            self.previous_timestamp = None
-
-            self.node.create_timer(0.01, self.callback)
+        self.df = pd.read_csv("output_csv/vallelunga_lap.csv", names=header)
+        self.df_iter = self.df.iterrows()
+        self.start_time = time.time()
+        self.previous_timestamp = None
+        self.node.create_timer(0.01, self.callback)
 
     def callback(self):
         try:
@@ -104,13 +101,9 @@ class AC_out:
 
 
 def main(args=None):
-    loop = False
-    if '-l' in sys.argv:
-        loop = True
-        sys.argv.remove('-l')
     
     rclpy.init(args=args)
-    output = AC_out(loop=loop)
+    output = AC_out()
     try:
         rclpy.spin(output.node)
     except KeyboardInterrupt:
