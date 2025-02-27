@@ -84,10 +84,11 @@ class AC_out:
             r = R.from_matrix([[row['worldMatrix_M00'], row['worldMatrix_M01'], row['worldMatrix_M02']],
                                [row['worldMatrix_M10'], row['worldMatrix_M11'], row['worldMatrix_M12']],
                                [row['worldMatrix_M20'], row['worldMatrix_M21'], row['worldMatrix_M22']]])
-            angles = r.as_euler('xyz')
-            odometry.pose.pose.orientation.x = angles[0]
-            odometry.pose.pose.orientation.y = angles[1]
-            odometry.pose.pose.orientation.z = angles[2]
+            q = r.as_quat()
+            odometry.pose.pose.orientation.x = q[0]
+            odometry.pose.pose.orientation.y = q[1]
+            odometry.pose.pose.orientation.z = q[2]
+            odometry.pose.pose.orientation.w = q[3]
 
             odometry.twist.twist.linear.x = row['velocity_x']
             odometry.twist.twist.linear.y = row['velocity_y']
