@@ -106,8 +106,6 @@ class AC_out:
                 print("End of CSV file reached. Exiting.")
                 rclpy.shutdown()
 
-
-
 def main(args=None):
     loop = '-l' in sys.argv
 
