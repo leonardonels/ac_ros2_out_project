@@ -77,15 +77,15 @@ class AC_out:
             odometry.header.stamp = self.node.get_clock().now().to_msg()
             odometry.header.frame_id = "base_link"
 
-            odometry.pose.pose.position.x = -row['worldMatrix_M03']
+            odometry.pose.pose.position.x = row['worldMatrix_M03']
             odometry.pose.pose.position.y = row['worldMatrix_M23']
             odometry.pose.pose.position.z = row['worldMatrix_M13']
 
             r = R.from_matrix([[row['worldMatrix_M00'], row['worldMatrix_M01'], row['worldMatrix_M02']],
                                [row['worldMatrix_M10'], row['worldMatrix_M11'], row['worldMatrix_M12']],
                                [row['worldMatrix_M20'], row['worldMatrix_M21'], row['worldMatrix_M22']]])
-            angles = r.as_euler('zxy')
-            odometry.pose.pose.orientation.x = -angles[0]
+            angles = r.as_euler('xyz')
+            odometry.pose.pose.orientation.x = angles[0]
             odometry.pose.pose.orientation.y = angles[1]
             odometry.pose.pose.orientation.z = angles[2]
 
