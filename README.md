@@ -10,8 +10,8 @@ sudo apt-get install ros-humble-ros-gz-bridge python3-numpy python3-pandas -y
 ```
 ## :gear: How to build & Run
 ```commandline
-git clone https://github.com/leonardonels/AC_ros2_out_project.git
-cd AC_ros2_out_project
+git clone https://github.com/leonardonels/ac_ros2_out_project.git
+cd ac_ros2_out_project
 ```
 ```commandline
 python3 output_node.py
