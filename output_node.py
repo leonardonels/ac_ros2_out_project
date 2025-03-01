@@ -7,7 +7,7 @@ from nav_msgs.msg import Odometry
 import sys
 
 
-class AC_out:
+class ac_out:
     def __init__(self, loop=False):
         self.node = rclpy.create_node('sim_sim')
         self.publisher = self.node.create_publisher(Odometry, 'odometry', 10)
@@ -111,7 +111,7 @@ def main(args=None):
     loop = '-l' in sys.argv
 
     rclpy.init(args=args)
-    output = AC_out(loop=loop)
+    output = ac_out(loop=loop)
     try:
         rclpy.spin(output.node)
     except KeyboardInterrupt:
