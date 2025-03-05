@@ -90,12 +90,12 @@ class ac_out:
             odometry.pose.pose.orientation.z = q[2]
             odometry.pose.pose.orientation.w = q[3]
 
-            odometry.twist.twist.linear.x = row['velocity_x']
-            odometry.twist.twist.linear.y = row['velocity_y']
-            odometry.twist.twist.linear.z = row['velocity_z']
-            odometry.twist.twist.angular.x = row['angularVelocity_x']
-            odometry.twist.twist.angular.y = row['angularVelocity_y']
-            odometry.twist.twist.angular.z = row['angularVelocity_z']
+            odometry.twist.twist.linear.x = row['localVelocity_x']
+            odometry.twist.twist.linear.y = row['localVelocity_y']
+            odometry.twist.twist.linear.z = row['localVelocity_z']
+            odometry.twist.twist.angular.x = row['localAngularVelocity_x']
+            odometry.twist.twist.angular.y = row['localAngularVelocity_y']
+            odometry.twist.twist.angular.z = row['localAngularVelocity_z']
 
             self.publisher.publish(odometry)
 
