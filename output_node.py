@@ -8,10 +8,9 @@ import sys
 
 
 class ac_out:
-    def __init__(self, loop=False):
+    def __init__(self):
         self.node = rclpy.create_node('sim_sim')
         self.publisher = self.node.create_publisher(Odometry, 'odometry', 10)
-        self.loop = loop
         header = [
             "timestamp",
             "engineRPM",
@@ -100,18 +99,12 @@ class ac_out:
             self.publisher.publish(odometry)
 
         except StopIteration:
-            if self.loop:
-                print("End of CSV file reached. Restarting.")
-                self.df_iter = self.df.iterrows()
-            else:
-                print("End of CSV file reached. Exiting.")
-                rclpy.shutdown()
-
+            print("End of CSV file reached. Restarting.")
+            self.df_iter = self.df.iterrows()
+            
 def main(args=None):
-    loop = '-l' in sys.argv
-
     rclpy.init(args=args)
-    output = ac_out(loop=loop)
+    output = ac_out()
     try:
         rclpy.spin(output.node)
     except KeyboardInterrupt:
