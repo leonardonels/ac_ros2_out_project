@@ -24,12 +24,14 @@ class ac_out:
             "velocity_x",
             "velocity_y",
             "velocity_z",
+
             "localVelocity_x",
-            "localVelocity_y",
             "localVelocity_z",
+            "localVelocity_y",
             "localAngularVelocity_x",
-            "localAngularVelocity_y",
             "localAngularVelocity_z",
+            "localAngularVelocity_y",
+            
             "angularVelocity_x",
             "angularVelocity_y",
             "angularVelocity_z",
@@ -97,6 +99,9 @@ class ac_out:
             odometry.twist.twist.angular.z = row['localAngularVelocity_z']
 
             self.publisher.publish(odometry)
+
+            print(f'[   local    ][{odometry.twist.twist.linear.x}, {odometry.twist.twist.linear.y}, {odometry.twist.twist.linear.z}]')
+            #print(f'[localAngular][{odometry.twist.twist.angular.x}, {odometry.twist.twist.angular.y}, {odometry.twist.twist.angular.z}]')
 
         except StopIteration:
             print("End of CSV file reached. Restarting.")
